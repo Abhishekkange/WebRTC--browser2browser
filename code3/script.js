@@ -1,3 +1,9 @@
+const senderButton = document.getElementById("peer1Submit");
+const senderInput = document.getElementById("peer1Input");
+
+
+
+
 
 
 //------------------------MAIN function HERE ------
@@ -115,8 +121,18 @@ function call() {
         console.log("data channel opened successfully");
         console.log(dataChannel);
 
-        senderDataChannel.send("Hello From Abhishek");
-        console.log("message sent");
+       
+    });
+
+    //sender button to send messages
+    senderButton.addEventListener("click", function(){
+
+       
+        const data = senderInput.value;
+        senderDataChannel.send(data);
+       
+
+
     });
 
     peerConnection2.addEventListener("datachannel", function (event) {
@@ -128,6 +144,7 @@ function call() {
         recieverDataChannel.addEventListener("message", function (event){
 
             console.log(event.data);
+            alert("message from Peer 1 :"+event.data);
 
 
         });
