@@ -21,7 +21,14 @@ PeerConnection1.createOffer().then((desc)=>{
 
     //desc gives you the SD. set as local desc for peer1 and remote for peer2
     console.log("offer created successfully");
-    PeerConnection1.setLocalDescription(desc);
-    //send this to peer 2 via web sockets
+    console.log(desc.sdp);
+    return PeerConnection1.setLocalDescription(desc);
     
-})
+}).then(()=>{
+
+    //send this( to peer 2 via web sockets
+    console.log("sent to client 2 via web sockets")
+});
+
+// data channel things here 
+
