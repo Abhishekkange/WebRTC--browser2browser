@@ -1,11 +1,6 @@
 const senderButton = document.getElementById("peer1Submit");
 const senderInput = document.getElementById("peer1Input");
 
-
-
-
-
-
 //------------------------MAIN function HERE ------
 
 function call() {
