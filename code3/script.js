@@ -6,8 +6,6 @@ const senderInput = document.getElementById("peer1Input");
 function call() {
 
     // console.log("function called")
-
-
     //connection and calling will start
 
 

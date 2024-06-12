@@ -33,22 +33,21 @@ button.addEventListener('click', function () {
 shareIce.addEventListener('click', function () {
 
 
-    if(isIceCandidateFound)
-        {
+    if (isIceCandidateFound) {
 
-            const data = {
-                type:"ICE",
-                value:candidate
-            }
-            wss.send(JSON.stringify(data));
-            console.log('candidate sent');
+        const data = {
+            type: "ICE",
+            value: candidate
         }
-        else{
-            
-            console.log("Ice candidate not found");
-            
-        }
-    
+        wss.send(JSON.stringify(data));
+        console.log('candidate sent');
+    }
+    else {
+
+        console.log("Ice candidate not found");
+
+    }
+
 
 });
 
@@ -76,7 +75,7 @@ const dataChannel = PeerConnection1.createDataChannel("datachannel");
 //ICE certifate event listener ( for connnection 1)
 PeerConnection1.addEventListener('icecandidate', function (event) {
 
-    
+
     isIceCandidateFound = true;
     console.log("ice candidate created");
     console.log("Ice candidate: " + event.candidate);
@@ -110,23 +109,26 @@ createOffer.addEventListener('click', function () {
         console.log("offer created successfully");
         console.log(desc.sdp);
         PeerConnection1.setLocalDescription(desc);
-        
+
 
     });
 
-   wss.addEventListener("message", data=>{
+    wss.addEventListener("message", data => {
 
         const data2 = JSON.parse(data);
         const type = data.type;
         const value = data.value;
 
-        if( type == "answer" )
-            {
-                PeerConnection1.setRemoteDescription(value);
-                console.log("Remote description set for peer 1");
-                
-            }
+        if (type == "answer") {
+            PeerConnection1.setRemoteDescription(value);
+            console.log("Remote description set for peer 1");
 
-   })
+        }
+        else if (type == "ICE") {
+            PeerConnection1.addIceCandidate(value);
+            console.log("Ice candidate set for peer 1");
+        }
+
+    })
 
 });

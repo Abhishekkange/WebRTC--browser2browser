@@ -1,4 +1,7 @@
 const wss = new WebSocket('wss://chaitanya-garg.com/');
+const shareICE = document.getElementById('peer2ShareIce');
+let isIceCandidateFound2 = false;
+let candidate;
 
 wss.addEventListener('open', function () {
 
@@ -9,20 +12,11 @@ wss.addEventListener('open', function () {
 //create a peer connection 
 const PeerConnection2 = new RTCPeerConnection(null);
 
+
 console.log("new peer connection created");
-
-PeerConnection2.addEventListener("icecandidate", event =>{
-
-
-    console.log("ICE candidate generated"+ event.candidate);
-    //send it through web sockets
-    const data = {
-
-        type: "ICE",
-        value: event.candidate
-
-    }
-    wss.send(data);
+PeerConnection2.addEventListener("icecandidate", event => {
+    console.log("ICE candidate generated" + event.candidate);
+    candidate = event.candidate;
 
 })
 
@@ -43,7 +37,7 @@ wss.addEventListener('message', data => {
                 type: 'answer',
                 value: answer
             }
-            wss.send(JSON.stringify(data));
+            PeerConnection2.setLocalDescription(answer);            wss.send(JSON.stringify(data));
 
         })
 
@@ -61,11 +55,31 @@ wss.addEventListener('message', data => {
 
         PeerConnection2.addIceCandidate(value);
         console.log("ICE candidate set successfully" + value);
-
-
     }
 
 })
 
+shareIce.addEventListener("click", function () {
+
+    if (isIceCandidateFound2) {
+
+        const data = {
+
+            type: "ICE",
+            value: candidate
+
+        }
+        wss.send(data);
+
+
+    } else {
+
+        console.log("Ice candidate not found");
+
+
+    }
+
+
+})
 
 
