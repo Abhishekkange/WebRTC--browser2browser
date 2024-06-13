@@ -1,5 +1,9 @@
 const wss = new WebSocket('wss://chaitanya-garg.com/');
 const callBtn = document.getElementById('callBtn');
+
+const remotevideo = document.getElementById('remotevideo');
+let localStream,remoteStream;
+
 const peer = new RTCPeerConnection({iceServers:[
     {
       urls: [
@@ -27,9 +31,25 @@ peer.addEventListener("icecandidate", event=>{
     console.log("ice candidated shared");
 })
 
+peer.addEventListener("track", event => {
+    if (!remoteStream) {
+        remoteStream = new MediaStream();
+        remotevideo.srcObject = remoteStream;
+    }
+    remoteStream.addTrack(event.track);
+    console.log("Remote stream received:", event.track);
+});
+
 
 
 callBtn.addEventListener('click',async function(){
+
+    //get user streama and set as local stream video
+    localStream = await navigator.mediaDevices.getUserMedia({video:true});
+     document.getElementById('localvideo').srcObject = localStream;
+
+     localStream.getTracks().forEach(track => peer.addTrack(track, localStream));
+     console.log("Strean started...");
 
     const offer = await peer.createOffer();
     peer.setLocalDescription(new RTCSessionDescription(offer));
@@ -49,7 +69,7 @@ wss.addEventListener("message", async message=>{
     //decode the message
     try{
 
-        data = JSON.parse(message.data);
+   data = JSON.parse(message.data);
     if(data.type === "offer"){
 
         peer.setRemoteDescription(new RTCSessionDescription(data.value));
@@ -115,12 +135,16 @@ peer.addEventListener("datachannel",event=>{
 
     }
 
+
+
     recieverDataChannel.addEventListener("message",message =>{
 
         console.log(message);
         console.log("message received successfully");
     
     });
+
+
     
     
 });
@@ -131,6 +155,12 @@ sendBtn.addEventListener("click",function(){
     senderDataChannel.send(data);
     console.log("data sent successfully");
 
+    //send video stream 
+   
+
+
 });
+
+
 
 
