@@ -1,53 +1,44 @@
+
+
 let localStream;
-const express = require('express');
-const app = express();
+let ws = new WebSocket('ws://localhost:3400');
+
+let videoPlayer;
+videoPlayer = document.getElementById('videoFromSocket');
 
 
-app.listen(3400,()=>{
+ws.onopen = () => {
 
-    console.log("listening on PORT 3400");
-
-});
-
-app.post('/camera-in',(req,res)=>{
-
-    
-
-
-
-
-})
-
-var btn = document.getElementById('buttton')
-
-btn.addEventListener('click', function(){
-
-    localStream = navigator.mediaDevices.getUserMedia({video:true});
-
-    //convert the stream to recording 
-    const  mediaRecorder = new MediaRecorder(localStream);
-    let chunks = [];
-    mediaRecorder.ondataavailable = function(event){
-
-        chunks.push(event.data);
-
-    }
-
-    mediaRecorder.onstop = async function() {
-        const blob = new Blob(chunks, { type: 'video/webm' });
-        await sendBlobToServer(blob);
-    };
-
-    // Start recording
-    mediaRecorder.start();
-
-});
-
-async function sendBlobToServer(blob) {
-
-    const formData = new FormData();
-    formData.append('file', blob, 'video.webm');
-
-
+    console.log("web socket opened");
 
 }
+
+ws.onmessage =message =>{
+
+    console.log("message recieved"+message.data);
+    const blob = new Blob([message.data], { type: 'video/webm' });
+    const url = URL.createObjectURL(blob);
+    videoPlayer.src = url;
+            //console.log(url);
+}
+
+
+
+var btn = document.getElementById('button')
+
+btn.addEventListener('click', async function(){
+
+    localStream = await navigator.mediaDevices.getUserMedia({video:true});
+    console.log(typeof(localStream));
+    const mediaRecorder = new MediaRecorder(localStream, { mimeType: 'video/webm' });
+
+    mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+            ws.send(event.data);
+            console.log("data sent");
+        }
+    };
+
+    mediaRecorder.start(100); // Send data in chunks of 100ms
+
+});

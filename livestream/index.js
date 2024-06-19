@@ -1,30 +1,31 @@
 const express = require('express');
+const WebSocket = require('ws');
+
 const app = express();
+const port = 3400;
 
+// Serve the HTML file
+app.use(express.static('public'));
 
-
-
-
-app.get('/camera', function(req,res){
-
-    const localStream = req.body.file;
-    
-
-    
-
-
-
-
-
-
+const server = app.listen(port, () => {
+    console.log(`Server is listening on http://localhost:${port}`);
 });
 
+const wss = new WebSocket.Server({ server });
 
+wss.on('connection', (ws) => {
+    console.log('New client connected');
 
-app.listen(3000,()=>{
+    ws.on('message', (message) => {
+        // Broadcast the message to all connected clients
+        wss.clients.forEach((client) => {
+            if (client !== ws && client.readyState === WebSocket.OPEN) {
+                client.send(message);
+            }
+        });
+    });
 
-
-    console.log('server streaming');
-   
-
-})
+    ws.on('close', () => {
+        console.log('Client disconnected');
+    });
+});

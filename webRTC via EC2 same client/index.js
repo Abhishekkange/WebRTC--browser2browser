@@ -1,8 +1,18 @@
 const wss = new WebSocket('wss://chaitanya-garg.com/');
+const localWebSocket = new WebSocket('ws://localhost:3400');
+
 const callBtn = document.getElementById('callBtn');
 
 const remotevideo = document.getElementById('remotevideo');
 let localStream,remoteStream;
+
+localWebSocket.onopen = () => {
+
+    console.log("localWebsocket open");
+
+}
+
+
 
 const peer = new RTCPeerConnection({iceServers:[
     {
@@ -35,8 +45,23 @@ peer.addEventListener("track", event => {
     if (!remoteStream) {
         remoteStream = new MediaStream();
         remotevideo.srcObject = remoteStream;
+        //send remote stream using localWebSockets
+        //localWebSocket.send(remoteStream);
+        
+
     }
     remoteStream.addTrack(event.track);
+    const mediaRecorder = new MediaRecorder(remoteStream, { mimeType: 'video/webm' });
+
+        mediaRecorder.ondataavailable = (event) => {
+            if (event.data.size > 0) {
+                localWebSocket.send(event.data);
+                console.log("data sent");
+            }
+        };
+    
+        mediaRecorder.start(100); // Send data in chunks of 100ms
+        console.log("remote stream sent");
     console.log("Remote stream received:", event.track);
 });
 
