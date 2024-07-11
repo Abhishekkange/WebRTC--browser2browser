@@ -31,7 +31,6 @@ console.log("Data channel created");
 
 peer.addEventListener("icecandidate", event=>{
 
-
     const data = {
         type: "icecandidate",
         value: event.candidate
@@ -45,6 +44,7 @@ peer.addEventListener("track", event => {
     if (!remoteStream) {
         remoteStream = new MediaStream();
         remotevideo.srcObject = remoteStream;
+        document.getElementById('remoteAudio').srcObject = remoteStream;
         //send remote stream using localWebSockets
         //localWebSocket.send(remoteStream);
         
@@ -70,14 +70,15 @@ peer.addEventListener("track", event => {
 callBtn.addEventListener('click',async function(){
 
     //get user streama and set as local stream video
-    localStream = await navigator.mediaDevices.getUserMedia({video:true});
+    const localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
      document.getElementById('localvideo').srcObject = localStream;
+    //  document.getElementById('localAudio').srcObject = localStream;
 
      localStream.getTracks().forEach(track => peer.addTrack(track, localStream));
      console.log("Strean started...");
 
     const offer = await peer.createOffer();
-    peer.setLocalDescription(new RTCSessionDescription(offer));
+    await peer.setLocalDescription(new RTCSessionDescription(offer));
     //send offer to client
     const data = {
         type:"offer",
@@ -94,7 +95,7 @@ wss.addEventListener("message", async message=>{
     //decode the message
     try{
 
-   data = JSON.parse(message.data);
+   let data = JSON.parse(message.data);
     if(data.type === "offer"){
 
         peer.setRemoteDescription(new RTCSessionDescription(data.value));

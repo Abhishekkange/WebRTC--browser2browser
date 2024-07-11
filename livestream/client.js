@@ -22,8 +22,6 @@ ws.onmessage =message =>{
             //console.log(url);
 }
 
-
-
 var btn = document.getElementById('button')
 
 btn.addEventListener('click', async function(){
