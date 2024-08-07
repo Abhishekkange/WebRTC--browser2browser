@@ -29,10 +29,6 @@ class ConnectionData {
             console.log(ourStream);
         }
 
-
-
-
-
         this.peer.addEventListener("track", event => {
             console.log("Tracks received from " + this.theirId);
             if (this.theirStream == undefined) {
@@ -63,9 +59,7 @@ class ConnectionData {
                 console.log("Remote Video Added to Videoplayer");
                 console.log("getting video track from videoplayer here here..")
                 console.log(remoteVideo.srcObject.getVideoTracks());
-           
-
-        
+       
             }
 
             wss.send(encode({
@@ -81,11 +75,13 @@ class ConnectionData {
         console.log("Generating Offer for " + this.theirId);
         this.offer = await this.peer.createOffer();
         console.log("Offer Generated.");
+        console.log(this.offer);
         this.peer.setLocalDescription(new RTCSessionDescription(this.offer));
     }
 
     async RecieveOffer(offer) {
         console.log("Offer received from " + this.theirId);
+        console.log(offer);
 
         this.peer.setRemoteDescription(new RTCSessionDescription(offer));
 

@@ -29,16 +29,16 @@ let senderDataChannel,recieverDataChannel;
 senderDataChannel = peer.createDataChannel("channel");
 console.log("Data channel created");
 
-// peer.addEventListener("icecandidate", event=>{
+peer.addEventListener("icecandidate", event=>{
 
-//     const data = {
-//         type: "icecandidate",
-//         value: event.candidate
-//     }
-//     wss.send(JSON.stringify(data));
-//     console.log(event.candidate);
-//     console.log("ice candidated shared");
-// })
+    const data = {
+        type: "icecandidate",
+        value: event.candidate
+    }
+    wss.send(JSON.stringify(data));
+    console.log(event.candidate);
+    console.log("ice candidated shared");
+})
 
 peer.addEventListener("track", event => {
     if (!remoteStream) {
@@ -72,8 +72,7 @@ peer.addEventListener("track", event => {
 callBtn.addEventListener('click',async function(){
 
     //get user streama and set as local stream video
-    let localStream;
-    // const localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+    const localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
      document.getElementById('localvideo').srcObject = localStream;
 
     //  document.getElementById('localAudio').srcObject = localStream;
