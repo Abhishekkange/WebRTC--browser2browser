@@ -29,30 +29,29 @@ let senderDataChannel,recieverDataChannel;
 senderDataChannel = peer.createDataChannel("channel");
 console.log("Data channel created");
 
-// peer.addEventListener("icecandidate", event=>{
+peer.addEventListener("icecandidate", event=>{
 
-//     const data = {
-//         type: "icecandidate",
-//         value: event.candidate
-//     }
-//     wss.send(JSON.stringify(data));
-//     console.log(event.candidate);
-//     console.log("ice candidated shared");
-// })
+    const data = {
+        type: "icecandidate",
+        value: event.candidate
+    }
+    wss.send(JSON.stringify(data));
+    console.log(event.candidate);
+    console.log("ice candidated shared");
+})
 
 peer.addEventListener("track", event => {
     if (!remoteStream) {
         remoteStream = new MediaStream();
         remotevideo.srcObject = remoteStream;
         document.getElementById('remoteAudio').srcObject = remoteStream;
-        console.log("Remote Stream addded to Remote Video")
+        console.log("remote stream added to videoplayer");
         //send remote stream using localWebSockets
         //localWebSocket.send(remoteStream);
         
 
     }
     remoteStream.addTrack(event.track);
-    console.log("Remote stream received:", event.track);
     const mediaRecorder = new MediaRecorder(remoteStream, { mimeType: 'video/webm' });
 
         mediaRecorder.ondataavailable = (event) => {
@@ -63,7 +62,7 @@ peer.addEventListener("track", event => {
         };
     
         mediaRecorder.start(100); // Send data in chunks of 100ms
-    
+        console.log("remote stream sent");
     console.log("Remote stream received:", event.track);
 });
 
@@ -72,14 +71,12 @@ peer.addEventListener("track", event => {
 callBtn.addEventListener('click',async function(){
 
     //get user streama and set as local stream video
-    let localStream;
-    // const localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+    const localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
      document.getElementById('localvideo').srcObject = localStream;
-
     //  document.getElementById('localAudio').srcObject = localStream;
 
      localStream.getTracks().forEach(track => peer.addTrack(track, localStream));
-     console.log("our stream added to track");
+     console.log("Strean started...");
 
     const offer = await peer.createOffer();
     await peer.setLocalDescription(new RTCSessionDescription(offer));
@@ -103,7 +100,6 @@ wss.addEventListener("message", async message=>{
     if(data.type === "offer"){
 
         peer.setRemoteDescription(new RTCSessionDescription(data.value));
-        console.log("offer recieved");
         const answer = await peer.createAnswer();
         peer.setLocalDescription(new RTCSessionDescription(answer));
         //send the answer to other peer
@@ -120,7 +116,7 @@ wss.addEventListener("message", async message=>{
 
         peer.setRemoteDescription(new RTCSessionDescription(data.value));
         console.log("Answer received");
-        console.log("Connection established (because answer received");
+        console.log("Connection established");
 
       
 
@@ -151,46 +147,8 @@ wss.addEventListener("message", async message=>{
     
 });
 
-senderDataChannel.addEventListener("open",event=>{
 
 
-    console.log("sender data channel opened");
-});
-
-peer.addEventListener("datachannel",event=>{
-
-    if(event.channel){
-
-        recieverDataChannel = event.channel;
-        console.log("reciever data channel accepted");
-
-    }
-
-
-
-    recieverDataChannel.addEventListener("message",message =>{
-
-        console.log(message);
-        console.log("message received successfully");
-    
-    });
-
-
-    
-    
-});
-
-sendBtn.addEventListener("click",function(){
-
-    const data = input.value;
-    senderDataChannel.send(data);
-    console.log("data sent successfully");
-
-    //send video stream 
-   
-
-
-});
 
 
 
