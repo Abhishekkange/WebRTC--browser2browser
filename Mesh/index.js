@@ -33,6 +33,7 @@ class ConnectionData {
         }
 
         ourStream.getTracks().forEach(track => this.peer.addTrack(track, ourStream));
+        console.log(ourStream.getVideoTracks());
 
         this.peer.addEventListener("track", event => {
             log("Tracks received from " + this.theirId);
@@ -40,11 +41,24 @@ class ConnectionData {
                 log("Creating new media stream");
                 this.theirStream = new MediaStream();
             }
-            this.theirStream.addTrack(event.track);
+
+            if(event.track.kind == "video")
+            {
+
+                
             const remoteVideo = document.createElement("video");
             remoteVideo.autoplay = true;
+            this.theirStream.addTrack(event.track);
             remoteVideo.srcObject = this.theirStream;
             document.getElementById("peerVideo").appendChild(remoteVideo);
+
+            }
+            
+            this.theirStream.addTrack(event.track);
+           
+         
+          
+
             // document.getElementById('remotevideo').srcObject = this.theirStream;
             log("Assigned");
             wss.send(encode({
