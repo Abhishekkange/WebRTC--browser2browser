@@ -44,23 +44,22 @@ class ConnectionData {
 
             if(event.track.kind == "video")
             {
-
-                
-            const remoteVideo = document.createElement("video");
+             const remoteVideo = document.createElement("video");
             remoteVideo.autoplay = true;
             this.theirStream.addTrack(event.track);
             remoteVideo.srcObject = this.theirStream;
             document.getElementById("peerVideo").appendChild(remoteVideo);
 
             }
-            
-            this.theirStream.addTrack(event.track);
-           
-         
-          
+            if(event.track.kind == "audio")
+            {
+                const remoteAudio = document.createElement("audio");
+                remoteAudio.autoplay = true;
+                this.theirStream.addTrack(event.track);
+                remoteAudio.srcObject = this.theirStream;
+                document.getElementById("peerVideo").appendChild(remoteAudio);
 
-            // document.getElementById('remotevideo').srcObject = this.theirStream;
-            log("Assigned");
+            }
             wss.send(encode({
                 'payloadType': 96,
                 'id': this.theirId
