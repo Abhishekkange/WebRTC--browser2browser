@@ -9,6 +9,7 @@ const callBtn = document.getElementById('callBtn');
 
 let ourStream;
 
+
 class ConnectionData {
     constructor(theirId) {
         this.theirId = theirId;
